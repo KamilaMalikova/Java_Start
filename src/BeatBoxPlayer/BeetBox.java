@@ -113,6 +113,7 @@ public class BeetBox {
             track.add(makeEvent(172, 1, 127, 0, 16));
         }
 
+        
         track.add(makeEvent(192, 9, 1, 0, 15));
         try{
             sequencer.setSequence(sequence);
