@@ -5,6 +5,10 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import static java.lang.System.out;
 
@@ -18,6 +22,8 @@ public class BeetBox {
     private JButton btnStop;
     private JButton btnTempoUp;
     private JButton btnTempoDown;
+    private JButton btnSaveToFile;
+    private JButton btnOpenFromFile;
 
     private Sequencer sequencer;
     private Sequence sequence;
@@ -41,12 +47,17 @@ public class BeetBox {
         btnStop = new JButton("Stop");
         btnTempoUp = new JButton("Tempo up");
         btnTempoDown = new JButton("Tempo down");
+        btnSaveToFile = new JButton("Save to file");
+        btnOpenFromFile = new JButton("Open from file");
+
         frame = new JFrame("BeetBox player");
 
         btnStart.addActionListener(new StartListener());
         btnStop.addActionListener(new StopListener());
         btnTempoUp.addActionListener(new UpTempoListener());
         btnTempoDown.addActionListener(new DownTempoLiastener());
+        btnOpenFromFile.addActionListener(new OpenFromFileListener());
+        btnSaveToFile.addActionListener(new SaveToFileListener());
 
         for (int i = 0; i<instrumentNames.length; i++){
             panelWest.add(new JLabel(instrumentNames[i]));
@@ -63,6 +74,8 @@ public class BeetBox {
         panelEast.add(btnStop);
         panelEast.add(btnTempoUp);
         panelEast.add(btnTempoDown);
+        panelEast.add(btnSaveToFile);
+        panelEast.add(btnOpenFromFile);
 
         frame.getContentPane().add(BorderLayout.EAST, panelEast);
         frame.getContentPane().add(BorderLayout.WEST, panelWest);
@@ -70,10 +83,10 @@ public class BeetBox {
 
         setUpMidi();
 
-        frame.setSize(300, 300);
+        frame.setSize(630, 460);
         frame.setLocation(100, 100);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.pack();
+        //frame.pack();
         frame.setVisible(true);
     }
 
@@ -176,6 +189,43 @@ public class BeetBox {
 
             float tempoFactor = sequencer.getTempoFactor();
             sequencer.setTempoFactor((float)(tempoFactor*0.97));
+        }
+    }
+
+    private class SaveToFileListener implements ActionListener{
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            try {
+            FileOutputStream fileOutputStream = new FileOutputStream("beats.sir");
+            ObjectOutputStream os = new ObjectOutputStream(fileOutputStream);
+            os.writeObject(checkBoxList);
+            os.close();
+            }catch (Exception ex){
+                ex.printStackTrace();
+            }
+        }
+    }
+
+    private class OpenFromFileListener implements ActionListener{
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            try{
+                FileInputStream fileInputStream = new FileInputStream("beats.sir");
+                ObjectInputStream os = new ObjectInputStream(fileInputStream);
+                Object object = os.readObject();
+                ArrayList<JCheckBox> checkBoxList2 = (ArrayList<JCheckBox>)object;
+                //panelCenter.removeAll();
+                for (int i = 0; i< checkBoxList.size(); i++){
+                    checkBoxList.get(i).setSelected(checkBoxList2.get(i).isSelected());
+                }
+                for (JCheckBox checkBox: checkBoxList2) {
+                    panelCenter.add(checkBox);
+                }
+                os.close();
+            }
+            catch (Exception ex){
+                ex.printStackTrace();
+            }
         }
     }
 
