@@ -4,7 +4,7 @@ import java.io.*;
 
 public  class Box implements Serializable {
     private int width;
-    private int height;
+    transient private int height;
 
     public Box(int width, int height){
         this.width = width;
